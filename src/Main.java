@@ -1,3 +1,4 @@
+
 /*
  * @author Ryan Scherbarth
  * cs251L
@@ -90,7 +91,18 @@ public class Main extends Application {
     // We also need an AnimationTimer to create words on the
     // screen every 3 seconds. This is done by call createWord
     // from the Words class.
-    AnimationTimer timer = null;
-    // timer.start();
+    AnimationTimer timer = new AnimationTimer() {
+      private long lastTime = 0;
+
+      @Override
+      public void handle(long currentTime) {
+        // Check if 3 seconds have passed since the last time a word was created
+        if (Duration.ofNanos(currentTime - lastTime).compareTo(Duration.ofSeconds(3)) >= 0) {
+          words.createWord();
+          lastTime = currentTime;
+        }
+      }
+    };
+    timer.start();
   }
 }

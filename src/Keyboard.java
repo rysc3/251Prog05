@@ -1,3 +1,4 @@
+
 /*
  * @author Ryan Scherbarth
  * cs251L
@@ -48,6 +49,13 @@ public class Keyboard {
    */
   public void startFillTransition(KeyCode keyCode) {
 
+    WordBox wordBox = keyCodeToWordBox.get(keyCode);
+    if (wordBox != null) {
+      FillTransition fillTransition = new FillTransition(Duration.seconds(0.2), wordBox.getRect(), from, to);
+      fillTransition.setAutoReverse(true);
+      fillTransition.play();
+    }
+
   }
 
   /**
@@ -59,7 +67,17 @@ public class Keyboard {
    * @return 2D list representing the letters on the keyboard
    */
   private List<List<KeyCode>> initializeKeys() {
-    return null;
+
+    List<List<KeyCode>> keys = new ArrayList<>();
+
+    keys.add(List.of(KeyCode.Q, KeyCode.W, KeyCode.E, KeyCode.R, KeyCode.T, KeyCode.Y, KeyCode.U, KeyCode.I, KeyCode.O,
+        KeyCode.P));
+    keys.add(
+        List.of(KeyCode.A, KeyCode.S, KeyCode.D, KeyCode.F, KeyCode.G, KeyCode.H, KeyCode.J, KeyCode.K, KeyCode.L));
+    keys.add(List.of(KeyCode.Z, KeyCode.X, KeyCode.C, KeyCode.V, KeyCode.B, KeyCode.N, KeyCode.M));
+
+    return keys;
+
   }
 
   /**
@@ -79,6 +97,40 @@ public class Keyboard {
    * @return JavaFX control that visualizes the keyboard on the screen
    */
   private VBox initializeKeyboard(double width, double height, List<List<KeyCode>> keyCodes, double spacing) {
-    return null;
+    // Calculate the size of each key
+    double keyWidth = (width - (2 * spacing)) / 10.0;
+    double keyHeight = (height - (4 * spacing)) / 3.0;
+
+    // Create the VBox that will contain all the rows of keys
+    VBox keyboard = new VBox(spacing);
+    keyboard.setAlignment(Pos.CENTER);
+
+    // Loop over each row of keys
+    for (List<KeyCode> row : keyCodes) {
+      // Create an HBox to hold all the keys in this row
+      HBox rowBox = new HBox(spacing);
+      rowBox.setAlignment(Pos.CENTER);
+
+      // Loop over each key in this row
+      for (KeyCode keyCode : row) {
+        // Create a new WordBox for this key
+        // WordBox wordBox = new WordBox(keyCode.getName(), keyWidth, keyHeight, from,
+        // to);
+        WordBox wordBox = new WordBox(width, height, keyCode.getName(), from);
+        // Add the WordBox to the map
+        keyCodeToWordBox.put(keyCode, wordBox);
+        // Add the WordBox to the row HBox
+
+        rowBox.getChildren().add(wordBox);
+      }
+
+      // Add the row HBox to the keyboard VBox
+      keyboard.getChildren().add(rowBox);
+    }
+
+    // Set the width and height of the keyboard VBox
+    keyboard.setPrefSize(width, height);
+
+    return keyboard;
   }
 }

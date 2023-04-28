@@ -14,12 +14,12 @@ public class WordBox {
   private final Rectangle rect;
   private final String word;
 
-  public WordBox(double size, String word, Color color) {
+  public WordBox(double sizeL, double sizeW, String word, Color color) {
     wordBox = new StackPane();
-    rect = new Rectangle(size, size, color);
+    rect = new Rectangle(sizeL, sizeW, color);
     this.word = word.toUpperCase();
     Label text = new Label(this.word);
-    text.setFont(new Font(size - 2));
+    text.setFont(new Font(sizeL - 2));
     wordBox.getChildren().addAll(rect, text);
   }
 
