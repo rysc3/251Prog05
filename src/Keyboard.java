@@ -8,7 +8,6 @@ import javafx.animation.FillTransition;
 import javafx.geometry.Pos;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -125,7 +124,7 @@ public class Keyboard {
         // wrapping wordBox in a pane to be able to add to rowBox
         // rowBox.add() only takes Nodes as input, can't pass a custom class
         Pane wordPane = new Pane(wordBox);
-        rowBox.getChildren().add(wordPane);
+        rowBox.getChildren().add(wordBox);
       }
 
       // Add the row HBox to the keyboard VBox
