@@ -39,8 +39,8 @@ public class Main extends Application {
     // Always make sure to set the title of the window
     primaryStage.setTitle("Key Shooter");
     // Width/height variables so that we can mess with the size of the window
-    double width = 600;
-    double height = 600;
+    double width = 800;
+    double height = 1000;
     // BorderPane
     // (https://openjfx.io/javadoc/18/javafx.graphics/javafx/scene/layout/BorderPane.html)
     // Provides the basis which we basis the rest of the GUI on
@@ -68,7 +68,7 @@ public class Main extends Application {
     // Create a VBox for the keyboard
     VBox keyBoardWindow = new VBox(10);
     // Create an instance of our helper class Keyboard
-    Keyboard keyboard = new Keyboard(width, height / 4, 10);
+    Keyboard keyboard = new Keyboard((width - 150), (height / 5), 10);
     // Add a horizontal line above the keyboard to create clear seperation
     keyBoardWindow.getChildren().addAll(new Separator(Orientation.HORIZONTAL), keyboard.getKeyboard());
     // Put it in the bottom of the BorderPane
@@ -81,7 +81,10 @@ public class Main extends Application {
     // Then add it to the typed letters
     scene.setOnKeyPressed(event -> {
       KeyCode keyCode = event.getCode();
-      keyboard.startFillTransition(keyCode);
+      // Well that's dumb, have to specifically say you want javafx.util seconds
+      // rather
+      // than just Duration.seconds, which will give you javafx.scene......
+      keyboard.startFillTransition(keyCode, javafx.util.Duration.seconds(0.5));
       words.addTypedLetter(keyCode);
     });
     // Set the scene

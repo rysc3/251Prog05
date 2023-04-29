@@ -8,6 +8,7 @@ import javafx.animation.FillTransition;
 import javafx.geometry.Pos;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -47,11 +48,11 @@ public class Keyboard {
    *
    * @param keyCode KeyCode to lookup in the map and flash
    */
-  public void startFillTransition(KeyCode keyCode) {
+  public void startFillTransition(KeyCode keyCode, Duration duration) {
 
     WordBox wordBox = keyCodeToWordBox.get(keyCode);
     if (wordBox != null) {
-      FillTransition fillTransition = new FillTransition(Duration.seconds(0.2), wordBox.getRect(), from, to);
+      FillTransition fillTransition = new FillTransition(duration, wordBox.getRect(), to, from);
       fillTransition.setAutoReverse(true);
       fillTransition.play();
     }
@@ -97,42 +98,32 @@ public class Keyboard {
    * @return JavaFX control that visualizes the keyboard on the screen
    */
   private VBox initializeKeyboard(double width, double height, List<List<KeyCode>> keyCodes, double spacing) {
-    // Calculate the size of each key
-    double keyWidth = (width - (2 * spacing)) / 10.0;
-    double keyHeight = (height - (4 * spacing)) / 3.0;
 
-    // Create the VBox that will contain all the rows of keys
     VBox keyboard = new VBox(spacing);
     keyboard.setAlignment(Pos.CENTER);
 
-    // Loop over each row of keys
+    // Calculate the size of each key based on the width and number of keys in each
+    // row
+    double keyWidth = width / keyCodes.get(0).size();
+    double keyHeight = keyWidth * 2;
+    // double scalingFactor = height / (keyHeight * keyCodes.size());
+    double scalingFactor = 1;
+
+    // Create a WordBox for each key and add it to the keyCodeToWordBox map
     for (List<KeyCode> row : keyCodes) {
-      // Create an HBox to hold all the keys in this row
       HBox rowBox = new HBox(spacing);
       rowBox.setAlignment(Pos.CENTER);
 
-      // Loop over each key in this row
-      for (KeyCode keyCode : row) {
-        // Create a new WordBox for this key
-        // WordBox wordBox = new WordBox(keyCode.getName(), keyWidth, keyHeight, from,
-        // to);
-        WordBox wordBox = new WordBox(width, height, keyCode.getName(), from);
-        // Add the WordBox to the map
-        keyCodeToWordBox.put(keyCode, wordBox);
-        // Add the WordBox to the row HBox
-
-        // wrapping wordBox in a pane to be able to add to rowBox
-        // rowBox.add() only takes Nodes as input, can't pass a custom class
-        Pane wordPane = new Pane(wordBox);
-        rowBox.getChildren().add(wordBox);
+      for (KeyCode code : row) {
+        WordBox wordBox = new WordBox(keyWidth, keyHeight, code.getName(), Color.LIGHTGRAY, scalingFactor);
+        rowBox.getChildren().add(wordBox.getWordBox());
+        keyCodeToWordBox.put(code, wordBox);
       }
 
-      // Add the row HBox to the keyboard VBox
       keyboard.getChildren().add(rowBox);
     }
 
-    // Set the width and height of the keyboard VBox
-    keyboard.setPrefSize(width, height);
+    keyboard.setScaleY(scalingFactor);
 
     return keyboard;
   }
