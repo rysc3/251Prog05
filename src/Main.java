@@ -17,6 +17,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import java.time.Duration;
+import javafx.scene.layout.Pane;
 
 public class Main extends Application {
   public static void main(String[] args) {
@@ -61,14 +62,17 @@ public class Main extends Application {
     // Create an instance of our helper Words class
 
     // Changed path to correct place.
+    Pane root = new Pane();
     Words words = new Words("../docs/words.txt", width, (height * 3) / 4,
-        scoreLabel, typedLabel);
+        scoreLabel, typedLabel, root);
+    window.setCenter(root);
+
     // Put it in the middle of the BorderPane
     window.setCenter(words.getWordsPane());
     // Create a VBox for the keyboard
     VBox keyBoardWindow = new VBox(10);
     // Create an instance of our helper class Keyboard
-    Keyboard keyboard = new Keyboard((width - 150), (height / 5), 10);
+    Keyboard keyboard = new Keyboard((width - 150), (height / 4), 10);
     // Add a horizontal line above the keyboard to create clear seperation
     keyBoardWindow.getChildren().addAll(new Separator(Orientation.HORIZONTAL), keyboard.getKeyboard());
     // Put it in the bottom of the BorderPane

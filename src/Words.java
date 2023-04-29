@@ -1,3 +1,4 @@
+
 /*
  * @author Ryan Scherbarth
  * cs251L
@@ -9,7 +10,6 @@ import javafx.animation.Timeline;
 import javafx.scene.control.Label;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
 
@@ -38,9 +38,11 @@ public class Words {
   // Width/height of the screen
   private final double width;
   private final double height;
+  // Pane where the words will be added
+  private final Pane root;
 
   public Words(String path, double width, double height,
-      Label scoreLabel, Label typedLabel) throws FileNotFoundException {
+      Label scoreLabel, Label typedLabel, Pane root) throws FileNotFoundException {
     wordsPane = new Pane();
     wordsPane.setPrefWidth(width);
     wordsPane.setPrefHeight(height);
@@ -55,6 +57,8 @@ public class Words {
 
     this.width = width;
     this.height = height;
+
+    this.root = root;
   }
 
   public Pane getWordsPane() {
@@ -68,7 +72,8 @@ public class Words {
    * @param wordBox WordBox to remove
    */
   private void removeWord(WordBox wordBox) {
-
+    wordsPane.getChildren().remove(wordBox);
+    activeWords.remove(wordBox);
   }
 
   /**
@@ -81,7 +86,42 @@ public class Words {
    * point over 10 seconds.
    */
   public void createWord() {
+    if (words.isEmpty()) {
+      return; // nempty list
+    }
 
+    int randomIndex = ThreadLocalRandom.current().nextInt(words.size());
+    String randomWord = words.get(randomIndex);
+    randomWord = randomWord.toUpperCase(); // hmm
+    // Printing out the word to the terminal each time for debugging
+    System.out.println(randomWord);
+
+    char startingChar = randomWord.charAt(0);
+    double startX, startY, endX, endY;
+    if (ThreadLocalRandom.current().nextBoolean()) {
+      startX = ThreadLocalRandom.current().nextDouble(width);
+      startY = ThreadLocalRandom.current().nextBoolean() ? 0 : height;
+      endX = ThreadLocalRandom.current().nextDouble(width);
+      endY = startY == 0 ? height : 0;
+    } else {
+      startX = ThreadLocalRandom.current().nextBoolean() ? 0 : width;
+      startY = ThreadLocalRandom.current().nextDouble(height);
+      endX = startX == 0 ? width : 0;
+      endY = ThreadLocalRandom.current().nextDouble(height);
+    }
+
+    WordBox wordBox = new WordBox(60, 60, randomWord, Color.BLACK, 1);
+    wordBox.getRect().setVisible(true);
+    wordBox.getWordBox().setTranslateX(startX);
+    wordBox.getWordBox().setTranslateY(startY);
+    root.getChildren().add(wordBox.getWordBox());
+
+    Timeline timeline = new Timeline();
+    timeline.getKeyFrames().add(new KeyFrame(Duration.seconds(10),
+        new KeyValue(wordBox.getWordBox().translateXProperty(), endX),
+        new KeyValue(wordBox.getWordBox().translateYProperty(), endY)));
+    timeline.setOnFinished(e -> root.getChildren().remove(wordBox.getWordBox()));
+    timeline.play();
   }
 
   /**
@@ -92,8 +132,38 @@ public class Words {
    * @param keyCode KeyCode to add to the state
    */
   public void addTypedLetter(KeyCode keyCode) {
-
+    if (keyCode.isLetterKey()) {
+      typed.add(keyCode);
+    } else if (keyCode == KeyCode.BACK_SPACE && !typed.isEmpty()) {
+      typed.remove(typed.size() - 1);
+    } else if (keyCode == KeyCode.SPACE) {
+      String typedString = getTypedString();
+      for (WordBox wordBox : activeWords) {
+        if (wordBox.getWord().equals(typedString.toUpperCase())) {
+          score++;
+          scoreLabel.setText("Score: " + score);
+          removeWord(wordBox);
+          typed.clear();
+          break;
+        }
+      }
+    }
+    typedLabel.setText(getTypedString());
   }
+
+  /*
+   * helper method that works with addTypedLetter to check if the word
+   * is complete
+   */
+  private String getTypedString() {
+    StringBuilder sb = new StringBuilder();
+    for (KeyCode keyCode : typed) {
+        if (keyCode.isLetterKey()) {
+            sb.append(keyCode.getChar());
+        }
+    }
+    return sb.toString();
+}
 
   /**
    * Checks if the given String is equal to any of the currently
@@ -103,6 +173,14 @@ public class Words {
    * @param s Word to check
    */
   private void checkForCorrectWord(String s) {
-
+    for (WordBox wordBox : activeWords) {
+      if (wordBox.getWord().equals(s)) {
+        removeWord(wordBox);
+        typed.clear();
+        score++;
+        scoreLabel.setText(Integer.toString(score));
+        return;
+      }
+    }
   }
 }
