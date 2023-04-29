@@ -103,14 +103,14 @@ public class Words {
     double startX, startY, endX, endY;
     if (ThreadLocalRandom.current().nextBoolean()) {
       startX = ThreadLocalRandom.current().nextDouble(width);
-      startY = ThreadLocalRandom.current().nextBoolean() ? 0 : height;
+      startY = ThreadLocalRandom.current().nextBoolean() ? 0 : height- 600;
       endX = ThreadLocalRandom.current().nextDouble(width);
       endY = startY == 0 ? height : 0;
     } else {
       startX = ThreadLocalRandom.current().nextBoolean() ? 0 : width;
-      startY = ThreadLocalRandom.current().nextDouble(height);
+      startY = ThreadLocalRandom.current().nextDouble(height - 600);
       endX = startX == 0 ? width : 0;
-      endY = ThreadLocalRandom.current().nextDouble(height);
+      endY = ThreadLocalRandom.current().nextDouble(height - 600);
     }
 
     WordBox wordBox = new WordBox(60, 60, randomWord, Color.TRANSPARENT, 1);
