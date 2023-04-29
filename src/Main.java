@@ -63,12 +63,15 @@ public class Main extends Application {
 
     // Changed path to correct place.
     Pane root = new Pane();
-    Words words = new Words("../docs/words.txt", width, (height * 3) / 4,
+    Words words = new Words("../docs/words.txt", width, (height * 3 / 4),
         scoreLabel, typedLabel, root);
-    window.setCenter(root);
+    // window.setCenter(root);
 
     // Put it in the middle of the BorderPane
     window.setCenter(words.getWordsPane());
+    words.getWordsPane().toFront();
+    window.setStyle("-fx-background-color: #FFFFFF;");
+
     // Create a VBox for the keyboard
     VBox keyBoardWindow = new VBox(10);
     // Create an instance of our helper class Keyboard

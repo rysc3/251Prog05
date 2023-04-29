@@ -19,7 +19,7 @@ public class WordBox {
     rect = new Rectangle(sizeL * scalingFactor, sizeW * scalingFactor, color);
     this.word = word.toUpperCase();
     Label text = new Label(this.word);
-    text.setFont(new Font(sizeL * scalingFactor / 2));
+    text.setFont(new Font(sizeL));  //  * scalingFactor / 2
     wordBox.getChildren().addAll(rect, text);
   }
 

@@ -7,6 +7,7 @@
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
+import javafx.event.ActionEvent;
 import javafx.scene.control.Label;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
@@ -17,6 +18,7 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 public class Words {
   // Pane
@@ -95,6 +97,8 @@ public class Words {
     randomWord = randomWord.toUpperCase(); // hmm
     // Printing out the word to the terminal each time for debugging
     System.out.println(randomWord);
+    System.out.println("[active]" + activeWords);
+
 
     char startingChar = randomWord.charAt(0);
     double startX, startY, endX, endY;
@@ -111,6 +115,9 @@ public class Words {
     }
 
     WordBox wordBox = new WordBox(60, 60, randomWord, Color.BLACK, 1);
+
+    activeWords.add(wordBox);
+
     wordBox.getRect().setVisible(true);
     wordBox.getWordBox().setTranslateX(startX);
     wordBox.getWordBox().setTranslateY(startY);
@@ -132,23 +139,30 @@ public class Words {
    * @param keyCode KeyCode to add to the state
    */
   public void addTypedLetter(KeyCode keyCode) {
+    // if (keyCode.isLetterKey()) {
+    //   typed.add(keyCode);
+    // } else if (keyCode == KeyCode.BACK_SPACE && !typed.isEmpty()) {
+    //   typed.remove(typed.size() - 1);
+    // } else if (keyCode == KeyCode.SPACE) {
+    //   String typedString = getTypedString();
+    //   for (WordBox wordBox : activeWords) {
+    //     if (wordBox.getWord().equals(typedString.toUpperCase())) {
+    //       score++;
+    //       scoreLabel.setText("Score: " + score);
+    //       removeWord(wordBox);
+    //       typed.clear();
+    //       break;
+    //     }
+    //   }
+    // }
+    // typedLabel.setText(getTypedString());
     if (keyCode.isLetterKey()) {
       typed.add(keyCode);
-    } else if (keyCode == KeyCode.BACK_SPACE && !typed.isEmpty()) {
-      typed.remove(typed.size() - 1);
-    } else if (keyCode == KeyCode.SPACE) {
-      String typedString = getTypedString();
-      for (WordBox wordBox : activeWords) {
-        if (wordBox.getWord().equals(typedString.toUpperCase())) {
-          score++;
-          scoreLabel.setText("Score: " + score);
-          removeWord(wordBox);
-          typed.clear();
-          break;
-        }
-      }
-    }
-    typedLabel.setText(getTypedString());
+      checkForCorrectWord(getTypedString());
+  } else if (keyCode == KeyCode.BACK_SPACE && !typed.isEmpty()) {
+      typed.remove(0);
+      typedLabel.setText(typed.stream().map(KeyCode::getName).collect(Collectors.joining("")));
+  }
   }
 
   /*
@@ -175,6 +189,7 @@ public class Words {
   private void checkForCorrectWord(String s) {
     for (WordBox wordBox : activeWords) {
       if (wordBox.getWord().equals(s)) {
+        System.out.println("REMOVED" + s);
         removeWord(wordBox);
         typed.clear();
         score++;
