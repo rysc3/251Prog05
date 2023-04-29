@@ -107,7 +107,7 @@ public class Keyboard {
     double keyWidth = width / keyCodes.get(0).size();
     double keyHeight = keyWidth * 2;
     // double scalingFactor = height / (keyHeight * keyCodes.size());
-    double scalingFactor = 1;
+    double scalingFactor = 0.8;
 
     // Create a WordBox for each key and add it to the keyCodeToWordBox map
     for (List<KeyCode> row : keyCodes) {

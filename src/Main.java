@@ -75,7 +75,7 @@ public class Main extends Application {
     // Create a VBox for the keyboard
     VBox keyBoardWindow = new VBox(10);
     // Create an instance of our helper class Keyboard
-    Keyboard keyboard = new Keyboard((width - 150), (height / 4), 10);
+    Keyboard keyboard = new Keyboard((width - 150), (height / 6), 10);
     // Add a horizontal line above the keyboard to create clear seperation
     keyBoardWindow.getChildren().addAll(new Separator(Orientation.HORIZONTAL), keyboard.getKeyboard());
     // Put it in the bottom of the BorderPane

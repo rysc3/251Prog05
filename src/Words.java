@@ -47,7 +47,7 @@ public class Words {
       Label scoreLabel, Label typedLabel, Pane root) throws FileNotFoundException {
     wordsPane = new Pane();
     wordsPane.setPrefWidth(width);
-    wordsPane.setPrefHeight(height);
+    wordsPane.setPrefHeight(height * 0.75);
 
     this.words = Utils.readWords(path);
 
@@ -89,12 +89,12 @@ public class Words {
    */
   public void createWord() {
     if (words.isEmpty()) {
-      return; // nempty list
+      return; // empty list
     }
 
     int randomIndex = ThreadLocalRandom.current().nextInt(words.size());
     String randomWord = words.get(randomIndex);
-    randomWord = randomWord.toUpperCase(); // hmm
+    randomWord = randomWord.toUpperCase();
     // Printing out the word to the terminal each time for debugging
     System.out.println(randomWord);
     System.out.println("[active]" + activeWords);
@@ -120,13 +120,15 @@ public class Words {
     wordBox.getRect().setVisible(true);
     wordBox.getWordBox().setTranslateX(startX);
     wordBox.getWordBox().setTranslateY(startY);
-    wordsPane.getChildren().add(wordBox.getWordBox()); // root -> wordsPane
+    wordsPane.getChildren().add(wordBox.getWordBox());
 
     Timeline timeline = new Timeline();
     timeline.getKeyFrames().add(new KeyFrame(Duration.seconds(10),
         new KeyValue(wordBox.getWordBox().translateXProperty(), endX),
         new KeyValue(wordBox.getWordBox().translateYProperty(), endY)));
-    timeline.setOnFinished(e -> root.getChildren().remove(wordBox.getWordBox()));
+    timeline.setOnFinished(e -> {
+      removeWord(wordBox);
+    });
     timeline.play();
   }
 
@@ -173,17 +175,29 @@ public class Words {
    * @param s Word to check
    */
   private boolean checkForCorrectWord(String s) {
+    // for (WordBox wordBox : activeWords) {
+    // if (wordBox.getWord().equals(s)) {
+    // score++;
+    // scoreLabel.setText("Score: " + score);
+    // removeWord(wordBox);
+    // typed.clear();
+    // typedLabel.setText("");
+    // return true;
+    // }
+    // }
+    // typedLabel.setText(s);
+    // return false;
     for (WordBox wordBox : activeWords) {
       if (wordBox.getWord().equals(s)) {
         score++;
         scoreLabel.setText("Score: " + score);
-        removeWord(wordBox);
-        typed.clear();
         typedLabel.setText("");
+        removeWord(wordBox); // add this line to remove the word from the screen
         return true;
       }
     }
     typedLabel.setText(s);
     return false;
+
   }
 }
