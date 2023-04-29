@@ -99,7 +99,6 @@ public class Words {
     System.out.println(randomWord);
     System.out.println("[active]" + activeWords);
 
-
     char startingChar = randomWord.charAt(0);
     double startX, startY, endX, endY;
     if (ThreadLocalRandom.current().nextBoolean()) {
@@ -114,14 +113,14 @@ public class Words {
       endY = ThreadLocalRandom.current().nextDouble(height);
     }
 
-    WordBox wordBox = new WordBox(60, 60, randomWord, Color.BLACK, 1);
+    WordBox wordBox = new WordBox(60, 60, randomWord, Color.TRANSPARENT, 1);
 
     activeWords.add(wordBox);
 
     wordBox.getRect().setVisible(true);
     wordBox.getWordBox().setTranslateX(startX);
     wordBox.getWordBox().setTranslateY(startY);
-    root.getChildren().add(wordBox.getWordBox());
+    wordsPane.getChildren().add(wordBox.getWordBox()); // root -> wordsPane
 
     Timeline timeline = new Timeline();
     timeline.getKeyFrames().add(new KeyFrame(Duration.seconds(10),
@@ -139,30 +138,17 @@ public class Words {
    * @param keyCode KeyCode to add to the state
    */
   public void addTypedLetter(KeyCode keyCode) {
-    // if (keyCode.isLetterKey()) {
-    //   typed.add(keyCode);
-    // } else if (keyCode == KeyCode.BACK_SPACE && !typed.isEmpty()) {
-    //   typed.remove(typed.size() - 1);
-    // } else if (keyCode == KeyCode.SPACE) {
-    //   String typedString = getTypedString();
-    //   for (WordBox wordBox : activeWords) {
-    //     if (wordBox.getWord().equals(typedString.toUpperCase())) {
-    //       score++;
-    //       scoreLabel.setText("Score: " + score);
-    //       removeWord(wordBox);
-    //       typed.clear();
-    //       break;
-    //     }
-    //   }
-    // }
-    // typedLabel.setText(getTypedString());
     if (keyCode.isLetterKey()) {
       typed.add(keyCode);
-      checkForCorrectWord(getTypedString());
-  } else if (keyCode == KeyCode.BACK_SPACE && !typed.isEmpty()) {
-      typed.remove(0);
+      String typedString = getTypedString();
+      if (checkForCorrectWord(typedString)) {
+        typed.clear();
+        typedLabel.setText("");
+      }
+    } else if (keyCode == KeyCode.BACK_SPACE && !typed.isEmpty()) {
+      typed.remove(typed.size() - 1); // remove current element
       typedLabel.setText(typed.stream().map(KeyCode::getName).collect(Collectors.joining("")));
-  }
+    }
   }
 
   /*
@@ -172,12 +158,12 @@ public class Words {
   private String getTypedString() {
     StringBuilder sb = new StringBuilder();
     for (KeyCode keyCode : typed) {
-        if (keyCode.isLetterKey()) {
-            sb.append(keyCode.getChar());
-        }
+      if (keyCode.isLetterKey()) {
+        sb.append(keyCode.getChar());
+      }
     }
     return sb.toString();
-}
+  }
 
   /**
    * Checks if the given String is equal to any of the currently
@@ -186,16 +172,18 @@ public class Words {
    *
    * @param s Word to check
    */
-  private void checkForCorrectWord(String s) {
+  private boolean checkForCorrectWord(String s) {
     for (WordBox wordBox : activeWords) {
       if (wordBox.getWord().equals(s)) {
-        System.out.println("REMOVED" + s);
+        score++;
+        scoreLabel.setText("Score: " + score);
         removeWord(wordBox);
         typed.clear();
-        score++;
-        scoreLabel.setText(Integer.toString(score));
-        return;
+        typedLabel.setText("");
+        return true;
       }
     }
+    typedLabel.setText(s);
+    return false;
   }
 }
