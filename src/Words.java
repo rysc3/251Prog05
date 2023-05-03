@@ -4,6 +4,7 @@
  * cs251L
  * 4/17/23
  */
+import javafx.animation.FadeTransition;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
@@ -77,12 +78,16 @@ public class Words {
    * @param wordBox WordBox to remove
    */
   private void removeWord(WordBox wordBox) {
+    FadeTransition fadeTransition = new FadeTransition(Duration.seconds(0.25), wordBox.getWordBox());
+    fadeTransition.setFromValue(1);
+    fadeTransition.setToValue(0);
+    fadeTransition.setOnFinished((ActionEvent event) -> {
+        wordsPane.getChildren().remove(wordBox.getWordBox());
+        activeWords.remove(wordBox);
+    });
+    fadeTransition.play();
+}
 
-    // wordsPane.getChildren().remove(wordBox);
-
-    wordsPane.getChildren().remove(wordBox.getWordBox());
-    activeWords.remove(wordBox);
-  }
 
   /**
    * Creates a random floating word.
