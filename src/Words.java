@@ -17,8 +17,11 @@ import javafx.util.Duration;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
+
+import javax.naming.TimeLimitExceededException;
 
 public class Words {
   // Pane
@@ -74,6 +77,7 @@ public class Words {
    * @param wordBox WordBox to remove
    */
   private void removeWord(WordBox wordBox) {
+
     wordsPane.getChildren().remove(wordBox);
     activeWords.remove(wordBox);
   }
@@ -88,47 +92,46 @@ public class Words {
    * point over 10 seconds.
    */
   public void createWord() {
-    if (words.isEmpty()) {
-      return; // empty list
-    }
+    Random random = new Random();
+    String word = words.get(random.nextInt(words.size()));
+    // public WordBox(double sizeL, double sizeW, String word, Color color, double
+    // scalingFactor)
+    WordBox activeWord = new WordBox((height / 10), width, word, Color.TRANSPARENT, 1);
 
-    int randomIndex = ThreadLocalRandom.current().nextInt(words.size());
-    String randomWord = words.get(randomIndex);
-    randomWord = randomWord.toUpperCase();
-    // Printing out the word to the terminal each time for debugging
-    System.out.println(randomWord);
-    System.out.println("[active]" + activeWords);
+    // Keep words within the boundaries of the screen
+    double rightEnd = width - (activeWord.getRect().getWidth() * 4);
+    double bottomEnd = height - (height / 4) - activeWord.getRect().getHeight();
+    double xCoord = random.nextInt(2) * rightEnd;
+    double yCoord = random.nextDouble(2) * bottomEnd; // bottomEnd
+    activeWord.getWordBox().relocate(xCoord, yCoord);
+    wordsPane.getChildren().add(activeWord.getWordBox());
+    activeWords.add(activeWord);
 
-    char startingChar = randomWord.charAt(0);
-    double startX, startY, endX, endY;
-    if (ThreadLocalRandom.current().nextBoolean()) {
-      startX = ThreadLocalRandom.current().nextDouble(width);
-      startY = ThreadLocalRandom.current().nextBoolean() ? 0 : height- 600;
-      endX = ThreadLocalRandom.current().nextDouble(width);
-      endY = startY == 0 ? height : 0;
-    } else {
-      startX = ThreadLocalRandom.current().nextBoolean() ? 0 : width;
-      startY = ThreadLocalRandom.current().nextDouble(height - 600);
-      endX = startX == 0 ? width : 0;
-      endY = ThreadLocalRandom.current().nextDouble(height - 600);
-    }
+    // generate random starting point for the word
+    final Timeline timeline = new Timeline();
+    timeline.setCycleCount(2);
+    timeline.setAutoReverse(true);
 
-    WordBox wordBox = new WordBox(60, 60, randomWord, Color.TRANSPARENT, 1);
+    // beginning coordinates
+    KeyValue xStart = new KeyValue(activeWord.getWordBox().translateXProperty(), 0);
+    KeyValue yStart = new KeyValue(activeWord.getWordBox().translateYProperty(), 0);
+    Duration startTime = Duration.ZERO;
+    KeyFrame beginKeyFrame = new KeyFrame(startTime, xStart, yStart);
 
-    activeWords.add(wordBox);
+    // randomly end each coordinate
+    KeyValue xEnd = new KeyValue(activeWord.getWordBox().translateXProperty(),
+        random.nextDouble(-xCoord, rightEnd - xCoord));
+    // KeyValue yEnd = new KeyValue(activeWord.getWordBox().translateYProperty(),
+    // random.nextDouble(-yCoord, bottomEnd - yCoord));
+    // KeyValue yEnd = new KeyValue(activeWord.getWordBox().translateYProperty(),
+    // random.nextDouble(yCoord));
+    KeyValue yEnd = new KeyValue(activeWord.getWordBox().translateYProperty(), 7);
+    Duration endTime = Duration.seconds(10);
+    KeyFrame keyFrameEnd = new KeyFrame(endTime, xEnd, yEnd);
 
-    wordBox.getRect().setVisible(true);
-    wordBox.getWordBox().setTranslateX(startX);
-    wordBox.getWordBox().setTranslateY(startY);
-    wordsPane.getChildren().add(wordBox.getWordBox());
-
-    Timeline timeline = new Timeline();
-    timeline.getKeyFrames().add(new KeyFrame(Duration.seconds(10),
-        new KeyValue(wordBox.getWordBox().translateXProperty(), endX),
-        new KeyValue(wordBox.getWordBox().translateYProperty(), endY)));
-    timeline.setOnFinished(e -> {
-      removeWord(wordBox);
-    });
+    // add keyframes
+    timeline.getKeyFrames().addAll(beginKeyFrame, keyFrameEnd);
+    timeline.setOnFinished(event -> removeWord(activeWord));
     timeline.play();
   }
 
@@ -175,18 +178,6 @@ public class Words {
    * @param s Word to check
    */
   private boolean checkForCorrectWord(String s) {
-    // for (WordBox wordBox : activeWords) {
-    // if (wordBox.getWord().equals(s)) {
-    // score++;
-    // scoreLabel.setText("Score: " + score);
-    // removeWord(wordBox);
-    // typed.clear();
-    // typedLabel.setText("");
-    // return true;
-    // }
-    // }
-    // typedLabel.setText(s);
-    // return false;
     for (WordBox wordBox : activeWords) {
       if (wordBox.getWord().equals(s)) {
         score++;
@@ -198,6 +189,5 @@ public class Words {
     }
     typedLabel.setText(s);
     return false;
-
   }
 }
