@@ -105,7 +105,7 @@ public class Keyboard {
     // Calculate the size of each key based on the width and number of keys in each
     // row
     double keyWidth = width / keyCodes.get(0).size();
-    double keyHeight = keyWidth * 2;
+    double keyHeight = (keyWidth * 2) * 3/4;
     // double scalingFactor = height / (keyHeight * keyCodes.size());
     double scalingFactor = 0.875;
 

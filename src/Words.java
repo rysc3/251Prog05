@@ -98,7 +98,7 @@ public class Words {
     String word = words.get(random.nextInt(words.size()));
     // public WordBox(double sizeL, double sizeW, String word, Color color, double
     // scalingFactor)
-    WordBox activeWord = new WordBox((height / 10), width, word, Color.TRANSPARENT, 1);
+    WordBox activeWord = new WordBox((height / 20), (width / 2), word, Color.TRANSPARENT, 1);
 
     // Keep words within the boundaries of the screen
     double rightEnd = width - (activeWord.getRect().getWidth() * 4);
@@ -128,7 +128,8 @@ public class Words {
     // KeyValue yEnd = new KeyValue(activeWord.getWordBox().translateYProperty(),
     // random.nextDouble(yCoord));
     KeyValue yEnd = new KeyValue(activeWord.getWordBox().translateYProperty(), 7);
-    Duration endTime = Duration.seconds(10);
+    Duration endTime = Duration.seconds(5);
+
     KeyFrame keyFrameEnd = new KeyFrame(endTime, xEnd, yEnd);
 
     // add keyframes
