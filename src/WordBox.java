@@ -16,6 +16,7 @@ public class WordBox {
   private final String word;
 
   public WordBox(double sizeL, double sizeW, String word, Color color, double scalingFactor) {
+
     wordBox = new StackPane();
     rect = new Rectangle(sizeL * scalingFactor, sizeW * scalingFactor, color);
     this.word = word.toUpperCase();
