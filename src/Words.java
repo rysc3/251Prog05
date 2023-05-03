@@ -78,7 +78,9 @@ public class Words {
    */
   private void removeWord(WordBox wordBox) {
 
-    wordsPane.getChildren().remove(wordBox);
+    // wordsPane.getChildren().remove(wordBox);
+
+    wordsPane.getChildren().remove(wordBox.getWordBox());
     activeWords.remove(wordBox);
   }
 
