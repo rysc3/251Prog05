@@ -11,6 +11,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
+import javafx.scene.control.Slider;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
@@ -72,15 +73,28 @@ public class Main extends Application {
     // words.getWordsPane().toFront();
     window.setStyle("-fx-background-color: #FFFFFF;");
 
-    // Create a VBox for the keyboard
+    // Create a VBox for the keyboard and slider
     VBox keyBoardWindow = new VBox(10);
     // Create an instance of our helper class Keyboard
     Keyboard keyboard = new Keyboard((width - 150), (height / 6), 10);
-    // Add a horizontal line above the keyboard to create clear seperation
+    // Add a horizontal line above the keyboard to create clear separation
     keyBoardWindow.getChildren().addAll(new Separator(Orientation.HORIZONTAL), keyboard.getKeyboard());
-    // Put it in the bottom of the BorderPane
+
+    // Create a slider for adjusting the rate at which words generate
+    Slider slider = new Slider(0, 5, 1); // minimum value = 0, maximum value = 5, default value = 1
+    slider.setShowTickMarks(true);
+    slider.setShowTickLabels(true);
+    slider.setMajorTickUnit(1);
+    slider.setMinorTickCount(0);
+    slider.setSnapToTicks(true);
+
+    // Add the slider to the VBox
+    keyBoardWindow.getChildren().add(slider);
+
+    // Put it in the bottom right of the BorderPane
     window.setBottom(keyBoardWindow);
-    // Create the scene
+    BorderPane.setAlignment(keyBoardWindow, Pos.BOTTOM_RIGHT);
+
     Scene scene = new Scene(window, width, height);
     // The scene is the best place to capture keyboard input
     // First get the KeyCode of the event
@@ -100,19 +114,31 @@ public class Main extends Application {
     primaryStage.show();
     // We also need an AnimationTimer to create words on the
     // screen every 3 seconds. This is done by call createWord
-    // from the Words class.
+    // from the Words class. // We also need an AnimationTimer to create words on
+    // the screen
+    // every X seconds, where X is the value of the slider.
     AnimationTimer timer = new AnimationTimer() {
       private long lastTime = 0;
+      private double delay = 3; // Default delay
 
       @Override
       public void handle(long currentTime) {
-        // Check if 3 seconds have passed since the last time a word was created
-        if (Duration.ofNanos(currentTime - lastTime).compareTo(Duration.ofSeconds(3)) >= 0) {
+        // Check if X seconds have passed since the last time a word was created,
+        // where X is the current value of the slider.
+        if (Duration.ofNanos(currentTime - lastTime).compareTo(Duration.ofSeconds((long) delay)) >= 0) {
           words.createWord();
           lastTime = currentTime;
         }
       }
     };
+    // Add a listener to the slider to update the delay time when the slider value
+    // changes.
+    slider.valueProperty().addListener((observable, oldValue, newValue) -> {
+      timer.stop();
+      //  delay = newValue.doubleValue();
+      timer.start();
+      // timer.delayProperty
+    });
     timer.start();
   }
 }
