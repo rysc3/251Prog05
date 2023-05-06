@@ -9,6 +9,7 @@ import javafx.application.Application;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.control.Slider;
@@ -140,5 +141,41 @@ public class Main extends Application {
       // timer.delayProperty
     });
     timer.start();
+
+    // Button to stop animations and display score
+Label stopLabel = new Label("X");
+stopLabel.setFont(new Font(20));
+stopLabel.setOnMouseClicked(e -> {
+  timer.stop(); // Stop the AnimationTimer
+  double score = Double.parseDouble(scoreLabel.getText());
+  double timeInMinutes = 4;
+  double wpm = score / timeInMinutes;
+  // Create a VBox to hold the score, WPM, and buttons
+  VBox scoreVBox = new VBox(20);
+  scoreVBox.setAlignment(Pos.CENTER);
+  Label scoreText = new Label("Score: " + score);
+  scoreText.setFont(new Font(30));
+  Label wpmText = new Label("Words per minute: " + wpm);
+  wpmText.setFont(new Font(30));
+  // Create buttons to quit and play again
+  Button quitButton = new Button("Quit");
+  quitButton.setOnAction(event -> {
+    primaryStage.close(); // Close the window
+  });
+  Button playAgainButton = new Button("Play Again");
+  playAgainButton.setOnAction(event -> {
+    // Restart the game
+    scoreLabel.setText("0");
+    typedLabel.setText("");
+    // words.reset();
+    timer.start();
+    primaryStage.setScene(scene);
+  });
+  scoreVBox.getChildren().addAll(scoreText, wpmText, quitButton, playAgainButton);
+  Scene scoreScene = new Scene(scoreVBox, width, height);
+  primaryStage.setScene(scoreScene);
+});
+topVBox.getChildren().add(stopLabel);
+
   }
 }
